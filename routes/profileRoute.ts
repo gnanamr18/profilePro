@@ -9,7 +9,7 @@ router.get('/', authMiddleware, getProfile);
 
 // Email-based routes
 router.get('/email/:email', authMiddleware, getProfileByEmail);
-router.delete('/email/:email', authMiddleware, deleteProfileByEmail);
+router.put('/email/:email', authMiddleware, deleteProfileByEmail);
 
 // POST /api/v1/profile
 router.post('/', createProfile);

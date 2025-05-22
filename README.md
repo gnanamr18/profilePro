@@ -2,6 +2,20 @@
 
 A backend API for managing user profiles built with Express.js, Node.js, TypeScript, and PostgreSQL.
 
+## Project Description
+
+ProfilePro is a robust backend service that demonstrates how to build a user management system with TypeScript, Express, and PostgreSQL. The application showcases the implementation of Drizzle ORM with PostgreSQL for efficient database operations and TypeScript for type safety.
+
+Key capabilities:
+- The user can create a user profile.
+- Administrators can viewsinge,view all and manage all user profiles
+- User profiles can be retrieved by email
+- Soft-delete functionality (deactivation) instead of permanent deletion
+- Role-based access control for different permission levels
+- JWT-based authentication system
+
+This project serves as a practical example of building a production-ready API with modern TypeScript practices and efficient database integration patterns.
+
 ## Features
 
 - User authentication with JWT

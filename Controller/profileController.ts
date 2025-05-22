@@ -16,7 +16,15 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
 
 export const createProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { name, email, password, isActive } = req.body;
+    const { name, email, password, isActive, role } = req.body;
+
+    // Check if email already exists
+    const existingProfiles = await db.select().from(profileSchema).where(eq(profileSchema.email, email));
+    
+    if (existingProfiles.length > 0) {
+      res.status(409).json({ error: 'Email already exists' });
+      return;
+    }
 
     // Create a new profile
     const newProfile = await db.insert(profileSchema).values({
@@ -24,6 +32,7 @@ export const createProfile = async (req: Request, res: Response, next: NextFunct
       email,
       password,
       isActive,
+      role,
     }).returning();
 
     res.status(201).json(newProfile);
@@ -62,10 +71,12 @@ export const deleteProfileByEmail = async (req: Request, res: Response, next: Ne
       return;
     }
 
-    // Delete the profile
-    await db.delete(profileSchema).where(eq(profileSchema.email, email));
+    // Soft delete by setting isActive to false
+    await db.update(profileSchema)
+      .set({ isActive: false })
+      .where(eq(profileSchema.email, email));
     
-    res.status(200).json({ message: 'Profile deleted successfully' });
+    res.status(200).json({ message: 'Profile deactivated successfully' });
   } catch (error) {
     next(error);
   }
