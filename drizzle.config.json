@@ -1,0 +1,10 @@
+
+
+{
+  "schema": "./db/schema.ts",
+  "out": "./db/migrations",
+  "dialect": "postgresql",
+  "dbCredentials": {
+    "url": "postgresql://postgres:postgres@localhost:5432/profilepro"
+  }
+} 
