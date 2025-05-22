@@ -1,20 +1,20 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { db } from '../db';
 import { profileSchema } from '../db';
+import { eq } from 'drizzle-orm';
 
-export const getProfile = async (req: Request, res: Response) => {
+export const getProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Fetch all profiles
     const profiles = await db.select().from(profileSchema);
     
     res.status(200).json(profiles);
   } catch (error) {
-    console.error('Error fetching profiles:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 };
 
-export const createProfile = async (req: Request, res: Response) => {
+export const createProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { name, email, password, isActive } = req.body;
 
@@ -28,7 +28,45 @@ export const createProfile = async (req: Request, res: Response) => {
 
     res.status(201).json(newProfile);
   } catch (error) {
-    console.error('Error creating profile:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
+  }
+};
+
+export const getProfileByEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { email } = req.params;
+
+    // Fetch profile by email
+    const profiles = await db.select().from(profileSchema).where(eq(profileSchema.email, email));
+    
+    if (!profiles.length) {
+      res.status(404).json({ error: 'Profile not found' });
+      return;
+    }
+    
+    res.status(200).json(profiles[0]);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteProfileByEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { email } = req.params;
+
+    // Check if profile exists
+    const profiles = await db.select().from(profileSchema).where(eq(profileSchema.email, email));
+    
+    if (!profiles.length) {
+      res.status(404).json({ error: 'Profile not found' });
+      return;
+    }
+
+    // Delete the profile
+    await db.delete(profileSchema).where(eq(profileSchema.email, email));
+    
+    res.status(200).json({ message: 'Profile deleted successfully' });
+  } catch (error) {
+    next(error);
   }
 };
